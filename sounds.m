@@ -37,10 +37,10 @@ wave2_sum = wave2_sum/max(abs(wave2_sum));
 Out = [zeros(size(values)); wave1_sum]';
 Out2 = [wave2_sum; zeros(size(values))]';
 
-combined = [wave2_sum; wave1_sum];
+combined = [wave1_sum(:), wave2_sum(:)];
 %audiowrite('20KHz5tone.wav',Out2,fs);
-audiowrite('19KHz5tone.wav',wave1_sum,fs);
-%audiowrite('21k_20k_10tone.wav', combined, fs);
+%audiowrite('19KHz5tone.wav',wave1_sum,fs);
+audiowrite('19k_20k_10tone.wav', combined, fs);
 
 %sound(combined, fs);
 sound(wave1_sum, fs);
