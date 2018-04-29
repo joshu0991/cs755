@@ -15,11 +15,11 @@ noverlap = 882;           % the overlap of the stft samples
 nfft = 44100;             % number of fft samples
 
 % first freq bin at 20 KHz
-twentyRange = [19950 20050];
-twentyTwoRange = [20150 20250];
-twentyFourRange = [20350 20450];
-twentySixRange = [20550 20650];
-twentyEightRange = [20750 20850];
+twentyRange = [17950 18050];
+twentyTwoRange = [18150 18250];
+twentyFourRange = [18350 18450];
+twentySixRange = [18550 18650];
+twentyEightRange = [18750 18850];
 
 nineteenRange = [18950 19050];
 nineteenTwoRange = [19150 19250];
@@ -41,11 +41,11 @@ range10 = round(nineteenEightRange);
 
 % calculate the frequencies
 freq = Fs*(0:samplesPerFrame/2-1)/samplesPerFrame;
-freq1 = 20000;
-freq2 = 20200;
-freq3 = 20400;
-freq4 = 20600;
-freq5 = 20800;
+freq1 = 18000;
+freq2 = 18200;
+freq3 = 18400;
+freq4 = 18600;
+freq5 = 18800;
 
 freq6 = 19000;
 freq7 = 19200;
@@ -53,7 +53,7 @@ freq8 = 19400;
 freq9 = 19600;
 freq10 = 19800;
 
-freq1Avg = (20000 + 20200 + 20400 + 20600 + 20800) / 5;
+freq1Avg = (18000 + 18200 + 18400 + 18600 + 18800) / 5;
 freq2Avg = (19000 + 19200 + 19400 + 19600 + 19800) / 5;
 
 values=0:1/fs:duration;
@@ -62,8 +62,14 @@ speakerDist1 = 0;
 speakerDist2 = 0;
 lastDopplerShift = 0;
 lastDopplerShift2 = 0;
+x = 0;
+% d = 60 cm
+d = 60;
+
+hold on;
 tic;
-while toc < 50
+while toc < 20
+    %fprintf('toc %i \n', toc);
     % get a sample from the microphone
     audioIn = step(microphone);
     
@@ -72,11 +78,11 @@ while toc < 50
   
     % find the noise variance for each channel which is the average of all
     % of the signal not near the base signal
-    noisevar1 = (sum(P(19950:19990))/40) + (sum(P(20010:20050))/40);
-    noisevar2 = (sum(P(20150:20190))/40) + (sum(P(20210:20250))/40);
-    noisevar3 = (sum(P(20350:20390))/40) + (sum(P(20410:20450))/40);
-    noisevar4 = (sum(P(20550:20590))/40) + (sum(P(20610:20650))/40);
-    noisevar5 = (sum(P(20750:20790))/40) + (sum(P(20810:20850))/40);
+    noisevar1 = (sum(P(17950:18990))/40) + (sum(P(18010:18050))/40);
+    noisevar2 = (sum(P(18150:18190))/40) + (sum(P(18210:18250))/40);
+    noisevar3 = (sum(P(18350:18390))/40) + (sum(P(18410:18450))/40);
+    noisevar4 = (sum(P(18550:18590))/40) + (sum(P(18610:20650))/40);
+    noisevar5 = (sum(P(18750:18790))/40) + (sum(P(18810:18850))/40);
 
     noisevar6 = (sum(P(18950:18990))/40) + (sum(P(19010:19050))/40);
     noisevar7 = (sum(P(19150:19190))/40) + (sum(P(19210:19250))/40);
@@ -190,12 +196,21 @@ while toc < 50
     
     fprintf('Doppler shift 1 %i\n', dopplerShift1);
     
-    speakerDist1 = speakerDist1 + (avg1)* 0.4;
-    speakerDist2 = speakerDist2 + (avg2) * 0.4;
+    speakerDist1 = speakerDist1 + (dopplerShift1) * 1;
+    speakerDist2 = speakerDist2 + (dopplerShift2) * 1;
+    
+    % theta 1
+    theta = acos(((speakerDist1^2) + (d^2) - (speakerDist2^2))/(2*d*speakerDist1));
+    
+    x1 = speakerDist1 * cos(theta);
+    y1 = speakerDist1 * sin(theta);
+    fprintf('X1: %i Y1 %i\n', x1, y1);
+ 
+    plot(x1, y1, '*');
     
     fprintf('-----------------------\n');
-    fprintf('speaker dist 1 %i\n', speakerDist1/1000);
-    fprintf('speaker dist 2 %i\n', speakerDist2/1000);
+    fprintf('speaker dist 1 %i\n', abs(speakerDist1));
+    fprintf('speaker dist 2 %i\n', abs(speakerDist2));
     fprintf('-----------------------\n');
     
     % paint the spectorgram for debugging
